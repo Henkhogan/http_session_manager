@@ -1,0 +1,1 @@
+This is supposed to simplify the case when you have need to proxy your aiohttp requests through different proxies

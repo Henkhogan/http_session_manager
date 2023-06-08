@@ -1,0 +1,14 @@
+# Project information: PyPI and Pip
+
+[project]
+name = 'http_session_manager'
+authors = [{name='Paul Henke'}]
+keywords = []
+classifiers = []
+#packages = ['http_session_manager']
+readme = 'Readme.md'
+version = '0.0.1'
+requires-python = '>= 3.11'
+dependencies = [
+    'aiohttp',
+]
