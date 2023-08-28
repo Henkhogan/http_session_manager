@@ -160,15 +160,13 @@ class SessionContext:
 		return aiohttp.ClientSession(connector = connector)
 	"""
 
-	async def __aenter__(self) -> SessionContext:
+	async def __aenter__(self) -> ClientSession:
 		self.active_clients += 1
 		self.activations += 1
-		return self
+		return await self.session
 
 	async def __aexit__(self, exc_t, exc_v, exc_tb):
 		self.active_clients -= 1
-		if any((exc_t, exc_tb, exc_v)):
-			logger.error(f'{exc_t=} | {exc_v=} | {traceback.format_tb(exc_tb)}')
 
 
 	def asdict(self) -> dict:
