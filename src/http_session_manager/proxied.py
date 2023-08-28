@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Self
+from typing import Any, Self
 from aiohttp import ClientSession, BaseConnector, TCPConnector
 from .session_context import SessionContext
 
@@ -50,13 +50,16 @@ class ProxiedHttpSessionManager:
 	@classmethod
 	def create(cls, pool_size: int = 4):
 		return cls(_http_session_pool = _http_session_pool_factory(size=pool_size))
+	
+	def __call__(self) -> SessionContext:
+		return self.get_session_context()
 
-	async def get_session_context(self, trials: int = 10) -> SessionContext:
+	def get_session_context(self, trials: int = 10) -> SessionContext:
 		try:
 			_http_session = self._http_session_pool.pop(0)
 		except IndexError:
 			_http_session = proxied_http_session_factory()
-			await _http_session.__aenter__()
+			
 
 		self._http_session_pool.append(_http_session)
 		return SessionContext(_session = _http_session)
@@ -68,7 +71,6 @@ class ProxiedHttpSessionManager:
 			await session_context._session.close()
 			await session_context._session.connector.close()
 			_session = proxied_http_session_factory()
-			await _session.__aenter__()
 			self._http_session_pool.append(_session)
 		except ValueError:
 			pass
