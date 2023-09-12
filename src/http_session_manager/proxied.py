@@ -74,3 +74,7 @@ class ProxiedHttpSessionManager:
 			self._http_session_pool.append(_session)
 		except ValueError:
 			pass
+
+	async def session(self):
+		"""do not enter, exit, or close the returned session"""
+		return await self.get_session_context().session
