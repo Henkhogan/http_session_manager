@@ -31,7 +31,6 @@ from aiohttp_proxy.errors import (
 
 from aiohttp_proxy import ProxyConnector, ProxyType
 from async_timeout import timeout
-from predictive.helper.stopwatch import Stopwatch
 
 from .exceptions import NoSessionError
 from proxy_manager import NordVpnProxyManager, ConnectorContext
