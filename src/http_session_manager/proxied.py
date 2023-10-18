@@ -1,7 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Any, Self
 from aiohttp import ClientSession, BaseConnector, TCPConnector
-from .session_context import SessionContext
 
 def proxied_http_session_factory(connector: BaseConnector | None = None, ttl_dns_cache: int = 300, keepalive_timeout:int = 60) -> ClientSession:
 	connector_owner = False
@@ -51,10 +50,9 @@ class ProxiedHttpSessionManager:
 	def create(cls, pool_size: int = 4):
 		return cls(_http_session_pool = _http_session_pool_factory(size=pool_size))
 	
-	def __call__(self) -> SessionContext:
-		return self.get_session_context()
 
-	def get_session_context(self, trials: int = 10) -> SessionContext:
+	async def session(self):
+		"""do not enter, exit, or close the returned session"""
 		try:
 			_http_session = self._http_session_pool.pop(0)
 		except IndexError:
@@ -62,19 +60,4 @@ class ProxiedHttpSessionManager:
 			
 
 		self._http_session_pool.append(_http_session)
-		return SessionContext(_session = _http_session)
-		
-	async def rotate(self, session_context: SessionContext, timeout: int = 60):
-		"""timeout in seconds"""
-		try:
-			self._http_session_pool.remove(session_context._session)
-			await session_context._session.close()
-			await session_context._session.connector.close()
-			_session = proxied_http_session_factory()
-			self._http_session_pool.append(_session)
-		except ValueError:
-			pass
-
-	async def session(self):
-		"""do not enter, exit, or close the returned session"""
-		return await self.get_session_context().session
+		return _http_session
