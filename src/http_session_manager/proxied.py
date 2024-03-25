@@ -55,6 +55,8 @@ class ProxiedHttpSessionManager:
 		"""do not enter, exit, or close the returned session"""
 		try:
 			_http_session = self._http_session_pool.pop(0)
+			if _http_session.closed:
+				_http_session = proxied_http_session_factory()
 		except IndexError:
 			_http_session = proxied_http_session_factory()
 			
